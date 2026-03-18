@@ -1,0 +1,16 @@
+@if (active()) {
+  <div class="loading-overlay">
+    <div class="loading-spinner"></div>
+    @if (message()) {
+      <p class="loading-message">{{ message() }}</p>
+    }
+    @if (percent() !== null) {
+      <div class="loading-progress">
+        <div class="loading-progress__bar"
+             [style.width.%]="percent()">
+        </div>
+      </div>
+      <span class="loading-percent">{{ percent() }}%</span>
+    }
+  </div>
+}

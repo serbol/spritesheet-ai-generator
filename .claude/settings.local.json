@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(git -C /c/Users/Serbol/work/spritesheet-ai-generator log --oneline -10)",
+      "Bash(npm list:*)",
+      "Bash(ng version:*)",
+      "Bash(npm install:*)",
+      "Bash(nvm --version)",
+      "Bash(command -v nvm)",
+      "Bash(nvm ls:*)",
+      "Bash(nvm list:*)",
+      "Bash(where nvm.exe)",
+      "Read(//c/Users/Serbol/AppData/Roaming/nvm/**)",
+      "Read(//c/Program Files/nodejs//**)",
+      "Bash(winget --version)",
+      "Bash(choco --version)",
+      "Bash(winget upgrade:*)",
+      "Bash(winget search:*)",
+      "Bash(winget install:*)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
+      "Bash(npm --version)",
+      "Read(//c/Users/Serbol/work/**)",
+      "Bash(ng new:*)",
+      "Bash(cp -r spritesheet-ai-generator-temp/* spritesheet-ai-generator/)",
+      "Bash(cp spritesheet-ai-generator-temp/.editorconfig spritesheet-ai-generator/)",
+      "Bash(cp spritesheet-ai-generator-temp/.gitignore spritesheet-ai-generator/)",
+      "Bash(cp spritesheet-ai-generator-temp/.prettierrc spritesheet-ai-generator/)",
+      "Bash(cp -r spritesheet-ai-generator-temp/.vscode spritesheet-ai-generator/)",
+      "Bash(mkdir -p src/app/core/services src/app/core/models src/app/core/guards src/app/shared/components/stepper src/app/shared/components/loading src/app/layout src/app/features/prompt src/app/features/editor src/app/features/capture src/app/features/stylize src/app/features/export src/assets/animations src/assets/shaders server/routes server/assets/models server/assets/temp server/assets/exports)",
+      "Bash(touch server/assets/models/.gitkeep server/assets/temp/.gitkeep server/assets/exports/.gitkeep)",
+      "Bash(npx ng:*)",
+      "Bash(timeout 5 npx tsx server/server.ts)"
+    ]
+  }
+}

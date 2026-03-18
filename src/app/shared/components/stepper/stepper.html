@@ -1,0 +1,23 @@
+<nav class="stepper">
+  @for (step of steps(); track step.index) {
+    <div class="stepper__step"
+         [class.stepper__step--active]="step.status === 'active'"
+         [class.stepper__step--completed]="step.status === 'completed'"
+         [class.stepper__step--locked]="step.status === 'locked'"
+         (click)="navigateTo(step)">
+      <div class="stepper__number">
+        @if (step.status === 'completed') {
+          <span class="checkmark">&#10003;</span>
+        } @else {
+          {{ step.index + 1 }}
+        }
+      </div>
+      <span class="stepper__label">{{ step.label }}</span>
+    </div>
+    @if (!$last) {
+      <div class="stepper__connector"
+           [class.stepper__connector--active]="step.status === 'completed'">
+      </div>
+    }
+  }
+</nav>

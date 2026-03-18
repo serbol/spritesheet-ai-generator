@@ -1,0 +1,92 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2rem;
+  gap: 0;
+
+  &__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    min-width: 80px;
+
+    &--locked {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &--active {
+      opacity: 1;
+    }
+
+    &--completed {
+      opacity: 1;
+    }
+  }
+
+  &__number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    color: #999;
+    transition: all 0.2s;
+
+    .stepper__step--active & {
+      border-color: #6366f1;
+      background: #6366f1;
+      color: #fff;
+    }
+
+    .stepper__step--completed & {
+      border-color: #22c55e;
+      background: #22c55e;
+      color: #fff;
+    }
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    .stepper__step--active & {
+      color: #6366f1;
+    }
+
+    .stepper__step--completed & {
+      color: #22c55e;
+    }
+  }
+
+  &__connector {
+    flex: 1;
+    height: 2px;
+    background: #e0e0e0;
+    min-width: 40px;
+    max-width: 80px;
+    margin: 0 0.5rem;
+    margin-bottom: 1.5rem;
+    transition: background 0.2s;
+
+    &--active {
+      background: #22c55e;
+    }
+  }
+
+  .checkmark {
+    font-size: 1rem;
+  }
+}
