@@ -1,4 +1,156 @@
 <div class="prompt-page">
-  <h2>Step 1: Describe Your Character</h2>
-  <p>Enter a text description and configure generation settings. This feature will be implemented in Phase 1.</p>
+  <!-- Header -->
+  <div class="prompt-header">
+    <h2>Step 1: Describe Your Character</h2>
+    <p>Enter a text description and configure generation settings to create a 3D model.</p>
+  </div>
+
+  <!-- Main content: form + preview side by side -->
+  <div class="prompt-content" [class.has-preview]="showPreview()">
+
+    <!-- Left: Generation Form -->
+    <div class="prompt-form" [class.hidden]="isGenerating() && !showPreview()">
+
+      <!-- Text prompt -->
+      <div class="form-group">
+        <label for="promptText">Character Description</label>
+        <textarea
+          id="promptText"
+          [(ngModel)]="config.text"
+          placeholder="e.g. medieval knight with sword and shield"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- Reference image upload -->
+      <div class="form-group">
+        <label>Reference Image (optional)</label>
+        @if (referencePreview()) {
+          <div class="reference-preview">
+            <img [src]="referencePreview()!" alt="Reference" />
+            <button class="btn-icon" (click)="removeReferenceImage()" title="Remove">&#x2715;</button>
+          </div>
+        } @else {
+          <label class="file-upload">
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
+            <span class="file-upload__label">Click to upload reference image</span>
+          </label>
+        }
+      </div>
+
+      <!-- Settings panel -->
+      <div class="settings-panel">
+        <h3>Settings</h3>
+
+        <div class="settings-grid">
+          <!-- Art style -->
+          <div class="form-group">
+            <label for="artStyle">Art Style</label>
+            <select id="artStyle" [(ngModel)]="config.artStyle">
+              <option value="realistic">Realistic</option>
+              <option value="stylized">Stylized</option>
+              <option value="low-poly">Low Poly</option>
+            </select>
+          </div>
+
+          <!-- Topology -->
+          <div class="form-group">
+            <label for="topology">Topology</label>
+            <select id="topology" [(ngModel)]="config.topology">
+              <option value="quad">Quad</option>
+              <option value="triangle">Triangle</option>
+            </select>
+          </div>
+
+          <!-- Poly count -->
+          <div class="form-group">
+            <label for="polyCount">Polygon Count</label>
+            <select id="polyCount" [(ngModel)]="config.polyCount">
+              <option value="low">Low (~10k)</option>
+              <option value="medium">Medium (~30k)</option>
+              <option value="high">High (~100k)</option>
+            </select>
+          </div>
+
+          <!-- Symmetry -->
+          <div class="form-group form-group--toggle">
+            <label for="symmetry">Symmetry</label>
+            <label class="toggle">
+              <input type="checkbox" id="symmetry" [(ngModel)]="config.symmetry" />
+              <span class="toggle__slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      @if (generationError()) {
+        <div class="error-banner">
+          <span>{{ generationError() }}</span>
+          <button class="btn-icon" (click)="generationError.set(null)">&#x2715;</button>
+        </div>
+      }
+
+      <!-- Generate button -->
+      <button
+        class="btn btn-primary"
+        (click)="generate()"
+        [disabled]="!config.text.trim() || isGenerating()"
+      >
+        Generate 3D Model
+      </button>
+    </div>
+
+    <!-- Loading state -->
+    @if (isGenerating()) {
+      <div class="generation-loading">
+        <app-loading
+          [active]="true"
+          [message]="progressMessage()"
+          [percent]="progressPercent()"
+        />
+      </div>
+    }
+
+    <!-- Right: Model Preview -->
+    @if (showPreview()) {
+      <div class="preview-panel">
+        <h3>Model Preview</h3>
+
+        <div class="preview-viewport">
+          <canvas #previewCanvas></canvas>
+        </div>
+
+        <!-- Model stats -->
+        @if (modelStats()) {
+          <div class="model-stats">
+            <div class="stat">
+              <span class="stat__label">Polygons</span>
+              <span class="stat__value">{{ modelStats()!.polyCount | number }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat__label">Rigged</span>
+              <span class="stat__value" [class.stat--yes]="modelStats()!.hasRig" [class.stat--no]="!modelStats()!.hasRig">
+                {{ modelStats()!.hasRig ? 'Yes' : 'No' }}
+              </span>
+            </div>
+            <div class="stat">
+              <span class="stat__label">Textures</span>
+              <span class="stat__value">{{ modelStats()!.textureCount }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="preview-actions">
+          <button class="btn btn-secondary" (click)="regenerate()" [disabled]="isGenerating()">
+            Regenerate
+          </button>
+          <button class="btn btn-primary" (click)="approveModel()" [disabled]="isGenerating()">
+            {{ modelStats()?.hasRig === false ? 'Approve & Auto-Rig' : 'Approve & Continue' }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
 </div>

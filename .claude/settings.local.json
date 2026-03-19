@@ -30,7 +30,14 @@
       "Bash(mkdir -p src/app/core/services src/app/core/models src/app/core/guards src/app/shared/components/stepper src/app/shared/components/loading src/app/layout src/app/features/prompt src/app/features/editor src/app/features/capture src/app/features/stylize src/app/features/export src/assets/animations src/assets/shaders server/routes server/assets/models server/assets/temp server/assets/exports)",
       "Bash(touch server/assets/models/.gitkeep server/assets/temp/.gitkeep server/assets/exports/.gitkeep)",
       "Bash(npx ng:*)",
-      "Bash(timeout 5 npx tsx server/server.ts)"
+      "Bash(timeout 5 npx tsx server/server.ts)",
+      "Bash(find /c/Users/Serbol/work/spritesheet-ai-generator/src -type f -name *.ts -o -name *.html -o -name *.scss)",
+      "Bash(curl -s http://localhost:3000/api/health)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3000)",
+      "Bash(curl -s -w \"\\\\nHTTP_STATUS: %{http_code}\" https://api.tripo3d.ai/v2/openapi/task -H \"Authorization: Bearer tsk_HOP2rMWbIux3wZywRSCrP9rTsfZNkDB8qPTe2c6VHQs\" -H \"Content-Type: application/json\" -d '{\"\"type\"\":\"\"text_to_model\"\",\"\"prompt\"\":\"\"test cube\"\",\"\"model_version\"\":\"\"v2.0-20240919\"\"}')",
+      "Bash(curl -s https://api.tripo3d.ai/v2/openapi/task -H \"Authorization: Bearer tsk_HOP2rMWbIux3wZywRSCrP9rTsfZNkDB8qPTe2c6VHQs\" -H \"Content-Type: application/json\" -d '{\"\"type\"\":\"\"text_to_model\"\",\"\"prompt\"\":\"\"a simple red cube\"\"}')",
+      "Bash(curl -s https://api.tripo3d.ai/v2/openapi/task/d1d1dde1-cc52-4fe9-be7b-a0bd7ee662b4 -H \"Authorization: Bearer tsk_HOP2rMWbIux3wZywRSCrP9rTsfZNkDB8qPTe2c6VHQs\")"
     ]
   }
 }

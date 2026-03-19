@@ -18,7 +18,7 @@
 │              Express Backend (API Proxy + Storage)              │
 │                                                                  │
 │  ┌─────────────┐  ┌──────────────┐  ┌───────────────────────┐  │
-│  │ Meshy/Tripo │  │ Asset Store  │  │ Stability/Replicate   │  │
+│  │ Tripo       │  │ Asset Store  │  │ Stability/Replicate   │  │
 │  │ API Proxy   │  │ (files/S3)   │  │ API Proxy             │  │
 │  └─────────────┘  └──────────────┘  └───────────────────────┘  │
 └──────────────────────────────────────────────────────────────────┘
@@ -71,18 +71,14 @@ npm install -D @types/express @types/cors @types/multer
   - Symmetry toggle
 - "Generate" button with progress indicator
 
-### 1.2 — Backend: Meshy API Integration
+### 1.2 — Backend: Tripo API Integration
 **Endpoint**: `POST /api/generate/model`
 
-- **Primary API: Meshy (meshy.ai)**
-  - `POST https://api.meshy.ai/openapi/v2/text-to-3d` — create task
-  - `GET https://api.meshy.ai/openapi/v2/text-to-3d/{taskId}` — poll status
-  - Returns GLB/FBX with textures and optional rigging
-  - Meshy-6 model supports automatic rigging for humanoid characters
-- **Fallback API: Tripo (tripo3d.ai)**
+- **API: Tripo (tripo3d.ai)**
   - `POST https://api.tripo3d.ai/v2/openapi/task` — create task
-  - Similar polling mechanism
-  - Also supports rigging and retopology
+  - `GET https://api.tripo3d.ai/v2/openapi/task/{taskId}` — poll status
+  - Returns GLB with textures
+  - Supports rigging and retopology
 - Poll for completion (typically 30-120 seconds)
 - Download GLB file and store in `server/assets/models/`
 - Return model URL + metadata to frontend
@@ -94,7 +90,6 @@ npm install -D @types/express @types/cors @types/multer
 
 ### 1.4 — Auto-Rigging (if model is unrigged)
 - If the generated model lacks a skeleton:
-  - Use Meshy's rigging API (`POST /openapi/v1/rig`) or
   - Use Tripo's rigging endpoint
   - Or use Mixamo-compatible auto-rigging via AccuRIG API
 - Store rigged model, proceed to Step 2
@@ -374,7 +369,7 @@ interface PipelineState {
 | Priority | Task | Est. Complexity | Dependencies |
 |----------|------|----------------|--------------|
 | 1 | Phase 0: Scaffolding | Low | None |
-| 2 | Phase 1.1-1.2: Prompt UI + Meshy API | Medium | Phase 0 |
+| 2 | Phase 1.1-1.2: Prompt UI + Tripo API | Medium | Phase 0 |
 | 3 | Phase 2.1: Three.js scene + model loading | Medium | Phase 1 |
 | 4 | Phase 2.2-2.3: Animation presets + timeline | High | Phase 2.1 |
 | 5 | Phase 3.1-3.3: Camera presets + frame capture | Medium | Phase 2 |
@@ -391,8 +386,8 @@ interface PipelineState {
 
 | Service | Operation | Approx. Cost |
 |---------|-----------|-------------|
-| Meshy AI | 1 text-to-3D generation | ~$0.10 (10 credits) |
-| Meshy AI | 1 rigging task | ~$0.05 (5 credits) |
+| Tripo AI | 1 text-to-3D generation | ~$0.10 |
+| Tripo AI | 1 rigging task | ~$0.05 |
 | Stability AI | Style transfer per frame (~50-100 frames) | ~$0.50-1.00 |
 | **Total** | **Per spritesheet** | **~$0.65-1.15** |
 
@@ -400,7 +395,7 @@ interface PipelineState {
 
 ## Key Technical Decisions
 
-1. **Why Meshy as primary 3D API?** — Best documentation, built-in rigging, GLB output with textures, competitive pricing, Meshy-6 model quality.
+1. **Why Tripo as 3D API?** — Good documentation, built-in rigging, GLB output with textures, competitive pricing.
 
 2. **Why Three.js over Babylon.js?** — Larger ecosystem, more animation examples, better Theatre.js integration, lighter bundle size.
 

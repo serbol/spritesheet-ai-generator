@@ -7,7 +7,7 @@ A web service that generates game-ready spritesheets from a text prompt — full
 - **Frontend**: Angular 21 (standalone components, signals)
 - **3D Engine**: Three.js with Theatre.js for animation timeline
 - **Backend**: Node.js / Express (API proxy & asset storage)
-- **AI Services**: Meshy API (3D generation), Stability AI (style transfer)
+- **AI Services**: Tripo API (3D generation), Stability AI (style transfer)
 
 ## Getting Started
 

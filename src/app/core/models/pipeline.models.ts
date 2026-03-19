@@ -22,7 +22,7 @@ export interface ModelResult {
   polyCount: number;
   textureCount: number;
   taskId: string;
-  provider: 'meshy' | 'tripo';
+  provider: 'tripo';
 }
 
 export interface AnimationConfig {
