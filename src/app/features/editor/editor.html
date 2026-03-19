@@ -1,4 +1,179 @@
 <div class="editor-page">
-  <h2>Step 2: Animation Editor</h2>
-  <p>Load your 3D model and apply skeleton animations. This feature will be implemented in Phase 2.</p>
+  <!-- Header -->
+  <div class="editor-header">
+    <h2>Step 2: Animation Editor</h2>
+    <p>Load animations onto your 3D model and configure playback settings.</p>
+  </div>
+
+  <div class="editor-content">
+    <!-- Left: 3D Viewport -->
+    <div class="viewport-panel">
+      <div class="viewport-container">
+        <canvas #viewport></canvas>
+      </div>
+
+      <!-- Viewport toolbar -->
+      <div class="viewport-toolbar">
+        <label class="toggle-label">
+          <input type="checkbox" [checked]="showSkeleton()" (change)="toggleSkeleton()" />
+          <span>Show Skeleton</span>
+        </label>
+        @if (boneCount() > 0) {
+          <span class="bone-count">{{ boneCount() }} bones</span>
+        }
+      </div>
+
+      <!-- Timeline -->
+      @if (activeAnimation()) {
+        <div class="timeline-panel">
+          <div class="timeline-controls">
+            <button class="btn-sm" (click)="togglePlayPause()">
+              {{ isPlaying() ? 'Pause' : 'Play' }}
+            </button>
+            <button class="btn-sm" (click)="stopAnimation()">Stop</button>
+            <span class="timeline-time">
+              {{ currentTime().toFixed(2) }}s / {{ duration().toFixed(2) }}s
+            </span>
+          </div>
+          <input
+            type="range"
+            class="timeline-scrubber"
+            [min]="0"
+            [max]="duration()"
+            [step]="0.01"
+            [value]="currentTime()"
+            (input)="scrubTo($event)"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- Right: Animation Panel -->
+    <div class="animation-panel">
+      <!-- Available animation presets -->
+      <div class="panel-section">
+        <h3>Animation Library</h3>
+        @if (availablePresets().length === 0) {
+          <p class="hint">
+            No animation files found. Place GLB animation files in
+            <code>server/assets/animations/</code>
+          </p>
+        } @else {
+          <div class="preset-list">
+            @for (preset of availablePresets(); track preset.filename) {
+              <button
+                class="preset-btn"
+                (click)="loadAnimation(preset)"
+                [disabled]="!modelLoaded()"
+              >
+                {{ preset.name }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Loaded animations -->
+      <div class="panel-section">
+        <h3>Loaded Animations</h3>
+        @if (animations().length === 0) {
+          <p class="hint">
+            No animations loaded yet. Select from the library above or load a rigged model with embedded animations.
+          </p>
+        }
+
+        <div class="animation-list">
+          @for (entry of animations(); track entry.preset.name) {
+            <div class="animation-card" [class.active]="activeAnimation() === entry" [class.selected]="entry.selected">
+
+              <div class="animation-card__header">
+                <label class="animation-card__check">
+                  <input
+                    type="checkbox"
+                    [checked]="entry.selected"
+                    [disabled]="!entry.clip"
+                    (change)="toggleAnimation(entry)"
+                  />
+                </label>
+                <span class="animation-card__name">{{ entry.preset.name }}</span>
+
+                @if (entry.loading) {
+                  <span class="animation-card__status">Loading...</span>
+                } @else if (entry.error) {
+                  <span class="animation-card__status animation-card__status--error">{{ entry.error }}</span>
+                } @else if (entry.clip) {
+                  <button class="btn-sm btn-play" (click)="playAnimation(entry)">
+                    {{ activeAnimation() === entry ? 'Restart' : 'Preview' }}
+                  </button>
+                }
+              </div>
+
+              @if (entry.clip && !entry.loading) {
+                <div class="animation-card__settings">
+                  <!-- Speed -->
+                  <div class="setting-row">
+                    <label>Speed</label>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="3"
+                      step="0.1"
+                      [value]="entry.speed"
+                      (input)="updateSpeed(entry, +$any($event.target).value)"
+                    />
+                    <span class="setting-value">{{ entry.speed.toFixed(1) }}x</span>
+                  </div>
+
+                  <!-- Frame count -->
+                  <div class="setting-row">
+                    <label>Frames</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="120"
+                      [value]="entry.frameCount"
+                      (input)="updateFrameCount(entry, +$any($event.target).value)"
+                    />
+                  </div>
+
+                  <!-- FPS -->
+                  <div class="setting-row">
+                    <label>FPS</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="60"
+                      [value]="entry.fps"
+                      (input)="updateFps(entry, +$any($event.target).value)"
+                    />
+                  </div>
+
+                  <!-- Loop -->
+                  <div class="setting-row">
+                    <label>Loop</label>
+                    <label class="toggle-sm">
+                      <input type="checkbox" [checked]="entry.loop" (change)="toggleLoop(entry)" />
+                      <span class="toggle-sm__slider"></span>
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="panel-actions">
+        <button class="btn btn-secondary" (click)="goBack()">Back</button>
+        <button
+          class="btn btn-primary"
+          [disabled]="!hasSelectedAnimations()"
+          (click)="confirmAndContinue()"
+        >
+          Confirm & Continue
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

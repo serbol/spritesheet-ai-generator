@@ -29,17 +29,20 @@
 ## Phase 0: Project Scaffolding
 
 ### 0.1 — Initialize Angular 21 Project
+
 - `ng new spritesheet-ai-generator --style=scss --ssr=false --routing`
 - Configure standalone components (default in Angular 21)
 - Set up path aliases in `tsconfig.json` (`@core/`, `@features/`, `@shared/`)
 
 ### 0.2 — Set Up Express Backend
+
 - Create `server/` directory with Express + TypeScript
 - Configure `dotenv` for API key management
 - Set up CORS for local development
 - Add proxy config in `angular.json` to forward `/api/*` to Express
 
 ### 0.3 — Install Core Dependencies
+
 ```
 # Frontend
 npm install three @types/three theatre @theatre/core @theatre/studio
@@ -51,6 +54,7 @@ npm install -D @types/express @types/cors @types/multer
 ```
 
 ### 0.4 — Create Feature Module Structure
+
 - Create lazy-loaded routes for each step
 - Implement a `StepperComponent` (shared) to navigate between pipeline steps
 - Set up a `PipelineStateService` (signal-based) to hold state across steps
@@ -60,6 +64,7 @@ npm install -D @types/express @types/cors @types/multer
 ## Phase 1: 3D Model Generation (Step 1)
 
 ### 1.1 — Prompt UI Component
+
 **Component**: `features/prompt/prompt.component.ts`
 
 - Text input for character description (e.g. "medieval knight with sword and shield")
@@ -72,6 +77,7 @@ npm install -D @types/express @types/cors @types/multer
 - "Generate" button with progress indicator
 
 ### 1.2 — Backend: Tripo API Integration
+
 **Endpoint**: `POST /api/generate/model`
 
 - **API: Tripo (tripo3d.ai)**
@@ -84,11 +90,13 @@ npm install -D @types/express @types/cors @types/multer
 - Return model URL + metadata to frontend
 
 ### 1.3 — Model Preview
+
 - After generation, show a quick Three.js preview of the model
 - Allow user to approve or regenerate
 - Display model stats (polycount, has-rig, texture count)
 
 ### 1.4 — Auto-Rigging (if model is unrigged)
+
 - If the generated model lacks a skeleton:
   - Use Tripo's rigging endpoint
   - Or use Mixamo-compatible auto-rigging via AccuRIG API
@@ -99,6 +107,7 @@ npm install -D @types/express @types/cors @types/multer
 ## Phase 2: 3D Animation Editor (Step 2)
 
 ### 2.1 — Three.js Scene Setup
+
 **Component**: `features/editor/editor.component.ts`
 
 - Load GLB model using `GLTFLoader`
@@ -108,25 +117,27 @@ npm install -D @types/express @types/cors @types/multer
 - Render loop managed by Angular's `afterNextRender` / `requestAnimationFrame`
 
 ### 2.2 — Animation Library (Presets)
+
 **Service**: `core/services/animation.service.ts`
 
 Store a library of reusable animation clips in `assets/animations/`:
 
-| Animation | File | Frames | Loop |
-|-----------|------|--------|------|
-| Idle      | idle.glb | 30 | yes |
-| Walk      | walk.glb | 24 | yes |
-| Run       | run.glb | 20 | yes |
-| Attack    | attack.glb | 15 | no |
-| Jump      | jump.glb | 20 | no |
-| Die       | die.glb | 25 | no |
-| Cast      | cast.glb | 20 | no |
+| Animation | File       | Frames | Loop |
+| --------- | ---------- | ------ | ---- |
+| Idle      | idle.glb   | 30     | yes  |
+| Walk      | walk.glb   | 24     | yes  |
+| Run       | run.glb    | 20     | yes  |
+| Attack    | attack.glb | 15     | no   |
+| Jump      | jump.glb   | 20     | no   |
+| Die       | die.glb    | 25     | no   |
+| Cast      | cast.glb   | 20     | no   |
 
 - Source animations from Mixamo (free, FBX/GLB)
 - Use `THREE.AnimationUtils.clone()` and retarget with `SkeletonUtils.retarget()`
 - Store animation clips as separate GLB files with only animation data
 
 ### 2.3 — Animation Timeline (Theatre.js)
+
 - Integrate Theatre.js Studio for visual timeline editing
 - Display current animation on timeline with keyframes
 - Allow basic adjustments:
@@ -136,6 +147,7 @@ Store a library of reusable animation clips in `assets/animations/`:
 - Play/Pause/Scrub controls
 
 ### 2.4 — Animation Retargeting
+
 **Utility**: `core/utils/animation-retarget.ts`
 
 - Map preset animation skeletons to the generated model's skeleton
@@ -143,24 +155,19 @@ Store a library of reusable animation clips in `assets/animations/`:
 - Use `SkeletonUtils.retargetClip()` from Three.js addons
 - Fallback: manual bone mapping UI if auto-mapping fails
 
-### 2.5 — Simple Bone Manipulation (Optional)
-- Click a bone to select it
-- Rotate selected bone with gizmo (`TransformControls`)
-- Record manual keyframes
-- This is a "nice-to-have" for v1 — presets are the primary workflow
-
 ---
 
 ## Phase 3: Frame Capture (Step 3)
 
 ### 3.1 — Camera Preset System
+
 **Component**: `features/capture/capture.component.ts`
 
 Define camera angles as presets:
 
 ```typescript
 interface CameraPreset {
-  name: string;           // e.g. "top-down", "side", "isometric"
+  name: string; // e.g. "top-down", "side", "isometric"
   position: Vector3;
   rotation: Euler;
   projection: 'perspective' | 'orthographic';
@@ -170,16 +177,17 @@ interface CameraPreset {
 
 **Built-in presets:**
 
-| Preset | Camera Position | Use Case |
-|--------|----------------|----------|
-| Top-Down | (0, 10, 0) looking down | Top-down RPGs |
-| Side | (10, 1, 0) looking left | Platformers |
-| Isometric | (7, 7, 7) 45° angle | Isometric RPGs |
-| Front | (0, 1, 10) looking at face | UI portraits |
-| 3/4 View | (5, 5, 5) | Classic RPGs |
-| Custom | User-defined | Any |
+| Preset    | Camera Position            | Use Case       |
+| --------- | -------------------------- | -------------- |
+| Top-Down  | (0, 10, 0) looking down    | Top-down RPGs  |
+| Side      | (10, 1, 0) looking left    | Platformers    |
+| Isometric | (7, 7, 7) 45° angle        | Isometric RPGs |
+| Front     | (0, 1, 10) looking at face | UI portraits   |
+| 3/4 View  | (5, 5, 5)                  | Classic RPGs   |
+| Custom    | User-defined               | Any            |
 
 ### 3.2 — Direction System
+
 For each camera preset, define character rotation directions:
 
 - **4-direction**: Down (0°), Left (90°), Right (270°), Up (180°)
@@ -187,6 +195,7 @@ For each camera preset, define character rotation directions:
 - User selects 4-dir or 8-dir
 
 ### 3.3 — Frame Renderer
+
 **Service**: `core/services/frame-capture.service.ts`
 
 - Create an offscreen `WebGLRenderer` (or use existing with `preserveDrawingBuffer`)
@@ -200,6 +209,7 @@ For each camera preset, define character rotation directions:
 - Show progress bar: `captured X / total frames`
 
 ### 3.4 — Capture Settings UI
+
 - Frame size (32x32, 64x64, 128x128, 256x256, custom)
 - Background: transparent / solid color
 - Anti-aliasing toggle
@@ -208,6 +218,7 @@ For each camera preset, define character rotation directions:
 - Shadow: on/off/baked
 
 ### 3.5 — Frame Preview Grid
+
 - Show captured frames in a preview grid
 - Allow user to re-capture individual frames
 - Highlight any frames that look off
@@ -217,24 +228,27 @@ For each camera preset, define character rotation directions:
 ## Phase 4: Style Transfer (Step 4)
 
 ### 4.1 — Style Selection UI
+
 **Component**: `features/stylize/stylize.component.ts`
 
 Available styles:
 
-| Style | Method | Description |
-|-------|--------|-------------|
-| Original (3D render) | No processing | Raw Three.js render output |
-| Pixel Art | Shader + downscale | Nearest-neighbor downscale → upscale, limited palette |
-| Cartoonish | AI img2img | Cel-shaded, bold outlines, flat colors |
-| Simplified | AI img2img | Minimal detail, clean shapes |
-| Outlined | Shader | Sobel edge detection + flat fill |
-| Hand-drawn | AI img2img | Sketch/watercolor appearance |
-| Retro 16-bit | Shader + palette | SNES-era color palette, dithering |
+| Style                | Method             | Description                                           |
+| -------------------- | ------------------ | ----------------------------------------------------- |
+| Original (3D render) | No processing      | Raw Three.js render output                            |
+| Pixel Art            | Shader + downscale | Nearest-neighbor downscale → upscale, limited palette |
+| Cartoonish           | AI img2img         | Cel-shaded, bold outlines, flat colors                |
+| Simplified           | AI img2img         | Minimal detail, clean shapes                          |
+| Outlined             | Shader             | Sobel edge detection + flat fill                      |
+| Hand-drawn           | AI img2img         | Sketch/watercolor appearance                          |
+| Retro 16-bit         | Shader + palette   | SNES-era color palette, dithering                     |
 
 ### 4.2 — Shader-Based Styles (Client-Side)
+
 **Location**: `assets/shaders/`
 
 For styles that don't need AI:
+
 - **Pixel Art**: Render at low res → nearest-neighbor upscale, apply palette quantization
 - **Outlined**: Sobel/Laplacian edge detection post-process
 - **Retro 16-bit**: Color palette reduction + ordered dithering
@@ -242,6 +256,7 @@ For styles that don't need AI:
 Implement as Three.js `ShaderPass` in `EffectComposer` or as 2D Canvas post-processing.
 
 ### 4.3 — AI-Based Styles (Server-Side)
+
 **Endpoint**: `POST /api/stylize/frames`
 
 - **Primary: Stability AI (img2img)**
@@ -254,12 +269,14 @@ Implement as Three.js `ShaderPass` in `EffectComposer` or as 2D Canvas post-proc
   - More flexibility but slower
 
 ### 4.4 — Batch Processing
+
 - Process frames in parallel (respect API rate limits)
 - Show progress: `styled X / Y frames`
 - Cache styled frames — if user re-runs with same style, skip already-processed frames
 - Allow style preview on a single frame before committing to full batch
 
 ### 4.5 — Style Consistency
+
 - Use the same seed across all frames of an animation for consistent style
 - For AI styles: include "consistent style, game sprite, same character" in all prompts
 - Post-process: normalize color palette across all frames
@@ -269,9 +286,11 @@ Implement as Three.js `ShaderPass` in `EffectComposer` or as 2D Canvas post-proc
 ## Phase 5: Spritesheet Export (Step 5)
 
 ### 5.1 — Spritesheet Layout Engine
+
 **Service**: `core/services/spritesheet.service.ts`
 
 Layout rules:
+
 ```
 Row = Animation + Direction
 Columns = Frame index (0, 1, 2, ...)
@@ -290,12 +309,14 @@ Row order (configurable):
 ```
 
 ### 5.2 — Canvas Composition
+
 - Create a single `<canvas>` with dimensions: `(frameWidth * maxFrameCount) x (frameHeight * totalRows)`
 - Draw each frame at its grid position
 - Support padding between frames (configurable gutter)
 - Optionally draw grid lines for debugging
 
 ### 5.3 — Export Formats
+
 **Component**: `features/export/export.component.ts`
 
 - **PNG** — standard spritesheet image (primary)
@@ -305,6 +326,7 @@ Row order (configurable):
 - **GIF preview** — animated preview of each action
 
 ### 5.4 — Metadata Format
+
 ```json
 {
   "spritesheet": "character_spritesheet.png",
@@ -319,6 +341,7 @@ Row order (configurable):
 ```
 
 ### 5.5 — Preview & Download UI
+
 - Full spritesheet preview with zoom/pan
 - Animated preview: click any animation row to play it
 - Download buttons for each format
@@ -329,6 +352,7 @@ Row order (configurable):
 ## Phase 6: Cross-Cutting Concerns
 
 ### 6.1 — Pipeline State Management
+
 **Service**: `core/services/pipeline-state.service.ts`
 
 Use Angular Signals to manage state across all steps:
@@ -346,18 +370,21 @@ interface PipelineState {
 ```
 
 ### 6.2 — Error Handling & Retries
+
 - Wrap all API calls in retry logic (3 attempts, exponential backoff)
 - Show user-friendly error messages with "Retry" buttons
 - Log errors to console with full context for debugging
 - Graceful degradation: if style transfer fails, offer unstyled frames
 
 ### 6.3 — API Key Management
+
 - Backend reads keys from `.env` (never exposed to frontend)
 - Frontend calls backend proxy endpoints only
 - Rate limit tracking per API to avoid overages
 - Usage dashboard showing API credit consumption
 
 ### 6.4 — Asset Cleanup
+
 - Temporary 3D models and frame images stored in `server/assets/temp/`
 - Clean up temp files after 24 hours (cron job or on-startup cleanup)
 - Final exports stored in `server/assets/exports/`
@@ -366,30 +393,30 @@ interface PipelineState {
 
 ## Implementation Order
 
-| Priority | Task | Est. Complexity | Dependencies |
-|----------|------|----------------|--------------|
-| 1 | Phase 0: Scaffolding | Low | None |
-| 2 | Phase 1.1-1.2: Prompt UI + Tripo API | Medium | Phase 0 |
-| 3 | Phase 2.1: Three.js scene + model loading | Medium | Phase 1 |
-| 4 | Phase 2.2-2.3: Animation presets + timeline | High | Phase 2.1 |
-| 5 | Phase 3.1-3.3: Camera presets + frame capture | Medium | Phase 2 |
-| 6 | Phase 5.1-5.3: Spritesheet layout + export | Medium | Phase 3 |
-| 7 | Phase 4.1-4.2: Shader styles (client-side) | Medium | Phase 3 |
-| 8 | Phase 4.3-4.4: AI style transfer | Medium | Phase 4.2 |
-| 9 | Phase 1.3-1.4: Model preview + auto-rigging | Low | Phase 1.2 |
-| 10 | Phase 2.5: Manual bone editing | High | Phase 2.3 |
-| 11 | Phase 6: Polish & error handling | Medium | All |
+| Priority | Task                                          | Est. Complexity | Dependencies |
+| -------- | --------------------------------------------- | --------------- | ------------ |
+| 1        | Phase 0: Scaffolding                          | Low             | None         |
+| 2        | Phase 1.1-1.2: Prompt UI + Tripo API          | Medium          | Phase 0      |
+| 3        | Phase 2.1: Three.js scene + model loading     | Medium          | Phase 1      |
+| 4        | Phase 2.2-2.3: Animation presets + timeline   | High            | Phase 2.1    |
+| 5        | Phase 3.1-3.3: Camera presets + frame capture | Medium          | Phase 2      |
+| 6        | Phase 5.1-5.3: Spritesheet layout + export    | Medium          | Phase 3      |
+| 7        | Phase 4.1-4.2: Shader styles (client-side)    | Medium          | Phase 3      |
+| 8        | Phase 4.3-4.4: AI style transfer              | Medium          | Phase 4.2    |
+| 9        | Phase 1.3-1.4: Model preview + auto-rigging   | Low             | Phase 1.2    |
+| 10       | Phase 2.5: Manual bone editing                | High            | Phase 2.3    |
+| 11       | Phase 6: Polish & error handling              | Medium          | All          |
 
 ---
 
 ## API Cost Estimates (per spritesheet)
 
-| Service | Operation | Approx. Cost |
-|---------|-----------|-------------|
-| Tripo AI | 1 text-to-3D generation | ~$0.10 |
-| Tripo AI | 1 rigging task | ~$0.05 |
-| Stability AI | Style transfer per frame (~50-100 frames) | ~$0.50-1.00 |
-| **Total** | **Per spritesheet** | **~$0.65-1.15** |
+| Service      | Operation                                 | Approx. Cost    |
+| ------------ | ----------------------------------------- | --------------- |
+| Tripo AI     | 1 text-to-3D generation                   | ~$0.10          |
+| Tripo AI     | 1 rigging task                            | ~$0.05          |
+| Stability AI | Style transfer per frame (~50-100 frames) | ~$0.50-1.00     |
+| **Total**    | **Per spritesheet**                       | **~$0.65-1.15** |
 
 ---
 
@@ -411,11 +438,11 @@ interface PipelineState {
 
 ## Risks & Mitigations
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| 3D model quality varies | Bad spritesheets | Allow regeneration; offer manual prompt refinement tips |
-| Animation retargeting fails | Broken poses | Provide manual bone mapping UI; curate compatible animation library |
-| Style transfer inconsistency | Frames look different | Same seed, batch prompts, post-process palette normalization |
-| API rate limits | Slow processing | Queue system, progress UI, caching of intermediate results |
-| Large file sizes | Slow downloads | Compress PNGs, offer quality settings, lazy-load previews |
-| Browser memory (many frames) | Crashes | Process in chunks, use OffscreenCanvas/Web Workers, limit max frames |
+| Risk                         | Impact                | Mitigation                                                           |
+| ---------------------------- | --------------------- | -------------------------------------------------------------------- |
+| 3D model quality varies      | Bad spritesheets      | Allow regeneration; offer manual prompt refinement tips              |
+| Animation retargeting fails  | Broken poses          | Provide manual bone mapping UI; curate compatible animation library  |
+| Style transfer inconsistency | Frames look different | Same seed, batch prompts, post-process palette normalization         |
+| API rate limits              | Slow processing       | Queue system, progress UI, caching of intermediate results           |
+| Large file sizes             | Slow downloads        | Compress PNGs, offer quality settings, lazy-load previews            |
+| Browser memory (many frames) | Crashes               | Process in chunks, use OffscreenCanvas/Web Workers, limit max frames |
